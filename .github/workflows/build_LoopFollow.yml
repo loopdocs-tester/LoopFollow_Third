@@ -17,14 +17,22 @@ jobs:
     uses: ./.github/workflows/validate_secrets.yml
     secrets: inherit
 
+  # Checks if Distribution certificate is present and valid, optionally nukes and
+  # creates new certs if the repository variable ENABLE_NUKE_CERTS == 'true'
+  check_certs:
+      name: Check certificates
+      needs: validate
+      uses: ./.github/workflows/check_certs.yml
+      secrets: inherit
+
   build:
     name: Build
-    needs: validate
-    runs-on: macos-14
+    needs: [validate, check_certs]
+    runs-on: macos-15
     steps:
       # Uncomment to manually select latest Xcode if needed
       - name: Select Latest Xcode
-        run: "sudo xcode-select --switch /Applications/Xcode_15.4.app/Contents/Developer"
+        run: "sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer"
 
       # Checks-out the repo
       - name: Checkout Repo
